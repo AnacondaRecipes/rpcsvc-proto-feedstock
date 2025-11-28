@@ -1,45 +1,41 @@
-{% set name = "<PLEASE ADD PKG NAME>" %}
-{% set version = "<PLEASE ADD PKG VERSION>" %}
+{% set name = "rpcsvc-proto" %}
+{% set version = "1.4.4" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: <sha256>
+  url: https://github.com/thkukuk/{{ name }}/releases/download/v{{ version }}/{{ name }}-{{ version }}.tar.xz
+  sha256: 81c3aa27edb5d8a18ef027081ebb984234d5b5860c65bd99d4ac8f03145a558b
 
 build:
   number: 0
-  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
-  skip: True  # [py<38]
+  skip: True  # [win]
 
 requirements:
-  host:
-    - python
-    - pip
-  run:
-    - python
+  build:
+    - {{ stdlib('c') }}
+    - {{ compiler('c') }}
+    - make
+    - libtool
 
 test:
-  imports:
-    - {{ name.replace('-', '.') }}
-  requires:
-    - pip
   commands:
-    - pip check
+    - rpcgen --help
+    - test -f $PREFIX/bin/rpcgen  # [unix]
 
 about:
-  home: <PLEASE ADD HOME URL>
-  summary: <PLEASE ADD SUMMARY>
+  home: https://github.com/thkukuk/rpcsvc-proto
+  summary: rpcsvc protocol definitions from glibc 
   description: |
-    <PLEASE ADD DESCRIPTION>
-  license: <PLEASE ADD LICENSE>
-  license_family: <PLEASE ADD LICENSE_FAMILY>
-  license_file: <PLEASE_ADD_LICENSE_FILE>
-  dev_url: <PLEASE ADD DEV URL>
-  doc_url: <PLEASE ADD DOC URL>
-
-extra:
-  recipe-maintainers:
-    - Jrice1317
+    This package contains rpcsvc proto.x files from glibc, which are
+    missing in libtirpc. Additional it contains rpcgen, which is needed
+    to create header files and sources from protocol files.
+    This package is only needed, if glibc is installed without the
+    deprecated sunrpc functionality and libtirpc should replace it.
+  license: BSD-3-Clause
+  license_family: BSD
+  license_file: COPYING
+  dev_url: https://github.com/thkukuk/rpcsvc-proto
+  doc_url: https://github.com/thkukuk/rpcsvc-proto
